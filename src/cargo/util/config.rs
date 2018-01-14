@@ -27,6 +27,7 @@ use util::errors::{CargoResult, CargoResultExt, CargoError, internal};
 use util::paths;
 use util::toml as cargo_toml;
 use util::{Filesystem, LazyCell};
+use util::SharedLogger;
 
 use self::ConfigValue as CV;
 
@@ -62,6 +63,8 @@ pub struct Config {
     cli_flags: CliUnstable,
     /// A handle on curl easy mode for http calls
     easy: LazyCell<RefCell<Easy>>,
+    /// A shared logger
+    logger: SharedLogger,
 }
 
 impl Config {
@@ -81,6 +84,7 @@ impl Config {
 
         Config {
             home_path: Filesystem::new(homedir),
+            logger: SharedLogger::new(shell.color_choice()),
             shell: RefCell::new(shell),
             rustc: LazyCell::new(),
             cwd: cwd,
@@ -231,6 +235,10 @@ impl Config {
         } else {
             Ok(None)
         }
+    }
+
+    pub fn logger(&self) -> &SharedLogger {
+        &self.logger
     }
 
     fn get(&self, key: &str) -> CargoResult<Option<ConfigValue>> {
@@ -491,6 +499,8 @@ impl Config {
         self.frozen = frozen;
         self.locked = locked;
         self.cli_flags.parse(unstable_flags)?;
+
+        self.logger().set_color_choice(self.shell().color_choice());
 
         Ok(())
     }

@@ -12,6 +12,7 @@ extern crate crates_io as registry;
 extern crate crossbeam;
 extern crate curl;
 extern crate docopt;
+extern crate env_logger;
 extern crate filetime;
 extern crate flate2;
 extern crate fs2;

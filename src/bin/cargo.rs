@@ -75,8 +75,6 @@ See 'cargo help <command>' for more information on a specific command.
 ";
 
 fn main() {
-    env_logger::init().unwrap();
-
     let mut config = match Config::default() {
         Ok(cfg) => cfg,
         Err(e) => {
@@ -84,6 +82,8 @@ fn main() {
             cargo::exit_with_error(e.into(), &mut shell)
         }
     };
+
+    config.logger().init();
 
     let result = (|| {
         let args: Vec<_> = try!(env::args_os()
